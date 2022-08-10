@@ -459,6 +459,27 @@
       y="7.7"
       z="10"/>
 
+    <box name="WallMiniArapucaOut" lunit="cm"
+      x="10.5"
+      y="2.5"
+      z="14"/>
+
+    <box name="WallMiniArapucaIn" lunit="cm"
+      x="10.5"
+      y="2"
+      z="10"/>
+
+     <subtraction name="WallMiniArapucaWalls">
+      <first  ref="WallMiniArapucaOut"/>
+      <second ref="WallMiniArapucaIn"/>
+      <position name="posWallMiniArapucaSub" x="0" y="1.25" z="0." unit="cm"/>
+      </subtraction>
+
+    <box name="WallMiniArapucaAcceptanceWindow" lunit="cm"
+      x="7.7"
+      y="1"
+      z="10"/>
+
 
     <box name="Cryostat" lunit="cm" 
       x="100.24" 
@@ -717,10 +738,45 @@
       <materialref ref="LAr"/>
       <solidref ref="MiniArapucaAcceptanceWindow"/>
     </volume>
+    <volume name="volWallMiniArapuca-0">
+      <materialref ref="G10" />
+      <solidref ref="WallMiniArapucaWalls" />
+    </volume>
+    <volume name="volOpDetSensitive_WallMiniArapuca-0">
+      <materialref ref="LAr"/>
+      <solidref ref="WallMiniArapucaAcceptanceWindow"/>
+    </volume>
+    <volume name="volWallMiniArapuca-1">
+      <materialref ref="G10" />
+      <solidref ref="WallMiniArapucaWalls" />
+    </volume>
+    <volume name="volOpDetSensitive_WallMiniArapuca-1">
+      <materialref ref="LAr"/>
+      <solidref ref="WallMiniArapucaAcceptanceWindow"/>
+    </volume>
+    <volume name="volWallMiniArapuca-2">
+      <materialref ref="G10" />
+      <solidref ref="WallMiniArapucaWalls" />
+    </volume>
+    <volume name="volOpDetSensitive_WallMiniArapuca-2">
+      <materialref ref="LAr"/>
+      <solidref ref="WallMiniArapucaAcceptanceWindow"/>
+    </volume>
+    <volume name="volWallMiniArapuca-3">
+      <materialref ref="G10" />
+      <solidref ref="WallMiniArapucaWalls" />
+    </volume>
+    <volume name="volOpDetSensitive_WallMiniArapuca-3">
+      <materialref ref="LAr"/>
+      <solidref ref="WallMiniArapucaAcceptanceWindow"/>
+    </volume>
 
     <volume name="volCryostat">
       <materialref ref="LAr" />
-      <solidref ref="Cryostat" />
+	<solidref ref="Cryostat" />
+	<auxiliary auxtype="SensDet" auxvalue="SimEnergyDeposit"/>
+	<auxiliary auxtype="StepLimit" auxunit="cm" auxvalue="0.47625*cm"/>
+	<auxiliary auxtype="Efield" auxunit="V/cm" auxvalue="0*V/cm"/>
       <physvol>
         <volumeref ref="volGaseousArgon"/>
         <position name="posGaseousArgon" unit="cm" x="30" y="0" z="0"/>
@@ -3067,6 +3123,62 @@
          x="-36.967"
 	 y="74.9" 
 	 z="118.4"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volWallMiniArapuca-0"/>
+       <position name="posWallMiniArapuca0" unit="cm" 
+         x="-31.707"
+	 y="178.5" 
+	 z="0"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volOpDetSensitive_WallMiniArapuca-0"/>
+       <position name="posOpWallMiniArapuca0" unit="cm" 
+         x="-31.707"
+	 y="176.74" 
+	 z="0"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volWallMiniArapuca-1"/>
+       <position name="posWallMiniArapuca1" unit="cm" 
+         x="-21.207"
+	 y="178.5" 
+	 z="0"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volOpDetSensitive_WallMiniArapuca-1"/>
+       <position name="posOpWallMiniArapuca1" unit="cm" 
+         x="-21.207"
+	 y="176.74" 
+	 z="0"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volWallMiniArapuca-2"/>
+       <position name="posWallMiniArapuca2" unit="cm" 
+         x="-31.707"
+	 y="178.5" 
+	 z="74.70045"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volOpDetSensitive_WallMiniArapuca-2"/>
+       <position name="posOpWallMiniArapuca2" unit="cm" 
+         x="-31.707"
+	 y="176.74" 
+	 z="74.70045"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volWallMiniArapuca-3"/>
+       <position name="posWallMiniArapuca3" unit="cm" 
+         x="-21.207"
+	 y="178.5" 
+	 z="74.70045"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volOpDetSensitive_WallMiniArapuca-3"/>
+       <position name="posOpWallMiniArapuca3" unit="cm" 
+         x="-21.207"
+	 y="176.74" 
+	 z="74.70045"/>
      </physvol>
     </volume>
 

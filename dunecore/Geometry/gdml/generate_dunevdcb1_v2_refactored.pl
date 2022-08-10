@@ -21,7 +21,7 @@
 #     V2:   Laura Paulucci: 17.03.22 Include Cathode and Cathode mesh
 #                                    Included 4 Mini-Arapucas and 1 X-Arapuca over the cathode
 #				       TPC height = 23 cm (not 30 cm)
-#
+#           Franciole Marinho: 21.07.2022 Included 4 Mini-Arapuscas on the vertical orientation
 #
 #################################################################################
 
@@ -290,6 +290,8 @@ $TileAcceptanceWindow_y = 60.0;
 $TileAcceptanceWindow_z = 60.0;
 $TileposY = 37.2; #with respect to cathode center
 $TileposZ = 37.3; #with respect to cathode center
+#$TileposZ = -37.3; #with respect to cathode center
+#MiniArapucas dimensions
 $MiniArapucaOut_x = 2.5; 
 $MiniArapucaOut_y = 10.5;
 $MiniArapucaOut_z = 14.0; 
@@ -308,7 +310,27 @@ $list_posy[2]=-$list_posy[1];
 $list_posz[2]=$list_posz[1];
 $list_posy[3]=-$list_posy[0];
 $list_posz[3]=$list_posz[0];
-
+$WallMiniArapucaOut_x = 10.5;
+$WallMiniArapucaOut_y = 2.5;
+$WallMiniArapucaOut_z = 14.0;
+$WallMiniArapucaIn_x = 7.7;
+$WallMiniArapucaIn_y = 2.0;
+$WallMiniArapucaIn_z = 10.0;
+$WallMiniArapucaAcceptanceWindow_x = 7.7;
+$WallMiniArapucaAcceptanceWindow_y = 1.0;
+$WallMiniArapucaAcceptanceWindow_z = 10.0;
+$W_posx[0] = 6.0;
+$W_posy[0] = $widthCathode/2.+10.0;
+$W_posz[0] = 0.0;
+$W_posx[1] = 16.5;
+$W_posy[1] = $widthCathode/2.+10.0;
+$W_posz[1] = 0.0;
+$W_posx[2] = 6.0;
+$W_posy[2] = $widthCathode/2.+10.0;
+$W_posz[2] = $lengthCathode/4.;
+$W_posx[3] = 16.5;
+$W_posy[3] = $widthCathode/2.+10.0;
+$W_posz[3] = $lengthCathode/4.;
 
 #+++++++++++++++++++++++++ End defining variables ++++++++++++++++++++++++++
 
@@ -1064,7 +1086,7 @@ print CRYO <<EOF;
 EOF
 
 #PDS
-#1 large X-Arapuca = TILE and 4 mini-Arapucas
+#1 large X-Arapuca = TILE and 4 mini-Arapucas + 4 wall mini-arapucas
 print CRYO <<EOF;
 <solids>
     <box name="TileOut" lunit="cm"
@@ -1108,6 +1130,27 @@ print CRYO <<EOF;
       x="@{[$MiniArapucaAcceptanceWindow_x]}"
       y="@{[$MiniArapucaAcceptanceWindow_y]}"
       z="@{[$MiniArapucaAcceptanceWindow_z]}"/>
+
+    <box name="WallMiniArapucaOut" lunit="cm"
+      x="@{[$WallMiniArapucaOut_x]}"
+      y="@{[$WallMiniArapucaOut_y]}"
+      z="@{[$WallMiniArapucaOut_z]}"/>
+
+    <box name="WallMiniArapucaIn" lunit="cm"
+      x="@{[$WallMiniArapucaOut_x]}"
+      y="@{[$WallMiniArapucaIn_y]}"
+      z="@{[$WallMiniArapucaIn_z]}"/>
+
+     <subtraction name="WallMiniArapucaWalls">
+      <first  ref="WallMiniArapucaOut"/>
+      <second ref="WallMiniArapucaIn"/>
+      <position name="posWallMiniArapucaSub" x="0" y="@{[$WallMiniArapucaOut_y/2.0]}" z="0." unit="cm"/>
+      </subtraction>
+
+    <box name="WallMiniArapucaAcceptanceWindow" lunit="cm"
+      x="@{[$WallMiniArapucaAcceptanceWindow_x]}"
+      y="@{[$WallMiniArapucaAcceptanceWindow_y]}"
+      z="@{[$WallMiniArapucaAcceptanceWindow_z]}"/>
 
 </solids>
 EOF
@@ -1153,11 +1196,27 @@ for($p=0 ; $p<4 ; $p++){
 EOF
 }
 
+for($p=0 ; $p<4 ; $p++){
+  print CRYO <<EOF;
+    <volume name="volWallMiniArapuca\-$p">
+      <materialref ref="G10" />
+      <solidref ref="WallMiniArapucaWalls" />
+    </volume>
+    <volume name="volOpDetSensitive_WallMiniArapuca\-$p">
+      <materialref ref="LAr"/>
+      <solidref ref="WallMiniArapucaAcceptanceWindow"/>
+    </volume>
+EOF
+}   
+
       print CRYO <<EOF;
 
     <volume name="volCryostat">
       <materialref ref="LAr" />
-      <solidref ref="Cryostat" />
+	<solidref ref="Cryostat" />
+	<auxiliary auxtype="SensDet" auxvalue="SimEnergyDeposit"/>
+	<auxiliary auxtype="StepLimit" auxunit="cm" auxvalue="0.47625*cm"/>
+	<auxiliary auxtype="Efield" auxunit="V/cm" auxvalue="0*V/cm"/>
       <physvol>
         <volumeref ref="volGaseousArgon"/>
         <position name="posGaseousArgon" unit="cm" x="@{[$Argon_x/2-$HeightGaseousAr/2]}" y="0" z="0"/>
@@ -1220,8 +1279,7 @@ $posX =  $Argon_x/2 - $HeightGaseousAr - 0.5*($driftTPCActive + $ReadoutPlane);
   </physvol>
 EOF
     }
-  }
-
+  }	
 
 $CathodePosX =-$OriginXSet+50+(-1-$NFieldShapers*0.5)*$FieldShaperSeparation - $heightCathode/2. - 2.*$mesh_diameter - 2.*$buffer_mesh;#new cathode position to accomodate the cathode mesh
 $CathodePosY = 0;
@@ -1354,7 +1412,30 @@ EOF
 
 }#end Ara for-loop
 
+for ($ara = 0; $ara<4; $ara++)
+{
+ 	     $Ara_X = $FrameCenter_x+$W_posx[$ara];
+             $Ara_Y = $FrameCenter_y+$W_posy[$ara];
+ 	     $Ara_Z = $FrameCenter_z+$W_posz[$ara];
 
+	print CRYO <<EOF;
+     <physvol>
+       <volumeref ref="volWallMiniArapuca\-$ara"/>
+       <position name="posWallMiniArapuca$ara" unit="cm" 
+         x="@{[$Ara_X]}"
+	 y="@{[$Ara_Y]}" 
+	 z="@{[$Ara_Z]}"/>
+     </physvol>
+     <physvol>
+       <volumeref ref="volOpDetSensitive_WallMiniArapuca-$ara"/>
+       <position name="posOpWallMiniArapuca$ara" unit="cm" 
+         x="@{[$Ara_X]}"
+	 y="@{[$Ara_Y-0.5*$WallMiniArapucaOut_y-0.5*$WallMiniArapucaAcceptanceWindow_y-0.01]}" 
+	 z="@{[$Ara_Z]}"/>
+     </physvol>
+EOF
+
+}#end WAra for-loop
 
 }
 
